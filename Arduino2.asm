@@ -1,0 +1,21 @@
+.device atmega328p
+.org 0x0
+LDI R16, 32; 10000
+LDI R17, 0
+LDI r19,0
+LDI R22, 1
+
+OUT MCUCR,R17
+OUT DDRB, R16
+
+
+LOP0:
+
+    IN R18,PINB
+    LSL R18
+    LSL R18
+    LSL R18
+    LSL R18
+    OUT PORTB, R18
+
+RJMP Lop0
