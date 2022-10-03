@@ -145,6 +145,7 @@ void loop() {
   bool buttonState;
   int gameon = 1;
   bool vez = 1;
+  int counter = 0;
   int turno = 0;
 
   for(int i=0;i < 3; i++){
@@ -192,38 +193,260 @@ void loop() {
       break;      
     }
     
-    delay(2);
+    delay(20);
 
     
     // AI
-    while (vez == 0){
+    //Win if possible:
+    //Check lines
+      int i = 0;
+      while ((i<3)&&(vez == 0))
+        {
+          counter = 0;
+          for (int j=0; j<3; j++)
+            {
+              if (board[i][j] == 2)
+              {
+                counter = counter + 1;
+              }
+            }
+          if (counter == 2) //If there is a winning move in the line
+          for (int j = 0; j<3; j++)
+            if (board[i][j]==0)
+            {
+              board[i][j] = 2;
+              vez = 1;
+              digitalWrite(LEDlist[i][j], HIGH);
+            }
+          i++;
+        }
       
-      int i = random(0, 3);
-      int j = random(0, 3);     
-      if(board[i][j] == 0){
+    //Check columns
+      i = 0;
+      while ((i<3)&&(vez == 0))
+        {
+          counter = 0;
+          for (int j=0; j<3; j++)
+            {
+              if (board[j][i] == 2)
+              {
+                counter = counter + 1;
+              }
+            }
+          if (counter == 2) //If there is a winning move in the line
+          for (int j = 0; j<3; j++)
+            if (board[j][i]==0)
+            {
+              board[j][i] = 2;
+              vez = 1;
+              digitalWrite(LEDlist[j][i], HIGH);
+            }
+          i = i + 1;
+        }
+      
+      //Check diagonals
+      counter = 0;
+      for (i=0; i<3; i++)
+        {
+          if (board[i][i] == 2)
+              {
+                counter = counter + 1;
+              }
+        }
+      if (counter == 2) //If there is a winning move in the diagonal
+      for (i = 0; i<3; i++)
+        {
+          if (board[i][i]==0)
+            {
+              board[i][i] = 2;
+              vez = 1;
+              digitalWrite(LEDlist[i][i], HIGH);
+            }  
+        }   
+
+
+      counter = 0;
+      for (i=0; i<3; i++)
+        {
+          if (board[i][2-i] == 2)
+              {
+                counter = counter + 1;
+              }
+        }
+      if (counter == 2) //If there is a winning move in the diagonal
+      for (i = 0; i<3; i++)
+        {
+          if (board[i][2-i]==0)
+            {
+              board[i][2-i] = 2;
+              vez = 1;
+              digitalWrite(LEDlist[i][2-i], HIGH);
+            }  
+        }   
         
-        vez = 1;
-        board[i][j] = 2;
-        digitalWrite(LEDlist[i][j], HIGH);
-        break;
-      }
+
+
+    //Block winning player moves
+        int j = 0;
+    //Check lines
+      i = 0;
+      while ((i<3)&&(vez == 0))
+        {
+          counter = 0;
+          for (j=0; j<3; j++)
+            {
+              if (board[i][j] == 1)
+              {
+                counter = counter + 1;
+              }
+            }
+          if (counter == 2) //If there is a winning move in the line
+          for (j = 0; j<3; j++)
+            if (board[i][j]==0)
+            {
+              board[i][j] = 2;
+              vez = 1;
+              digitalWrite(LEDlist[i][j], HIGH);
+            }
+          i = i + 1;
+        }
+      
+    //Check columns
+      i = 0;
+      while ((i<3)&&(vez == 0))
+        {
+          counter = 0;
+          for (j=0; j<3; j++)
+            {
+              if (board[j][i] == 1)
+              {
+                counter = counter + 1;
+              }
+            }
+          if (counter == 2) //If there is a winning move in the line
+          for (j = 0; j<3; j++)
+            if (board[j][i]==0)
+            {
+              board[j][i] = 2;
+              vez = 1;
+              digitalWrite(LEDlist[j][i], HIGH);
+            }
+          i++;
+        }
+      
+      //Check diagonals
+      while(vez == 0)
+      {
+        counter = 0;
+        
+        for (i=0; i<3; i++)
+          {
+            if (board[i][i] == 1)
+                {
+                  counter = counter + 1;
+                }
+          }
+        if (counter == 2){ //If there is a winning move in the diagonal
+          for (i = 0; i<3; i++)
+          {
+            if (board[i][i]==0)
+              {
+                board[i][i] = 2;
+                vez = 1;
+                digitalWrite(LEDlist[i][i], HIGH);
+              }  
+          }
+        }   
+
+
+        counter = 0;
+        for (i=0; i<3; i++)
+          {
+            if (board[i][2-i] == 1)
+                {
+                  counter = counter + 1;
+                }
+          }
+        if (counter == 2){ //If there is a winning move in the diagonal
+          for (i = 0; i<3; i++)
+          {
+            if (board[i][2-i]==0)
+              {
+                board[i][2-i] = 2;
+                vez = 1;
+                digitalWrite(LEDlist[i][2-1], HIGH);
+              }  
+          }   
+          }
+
+        //If there are no winning moves for either side:
+        if (board[1][1]==0&&vez == 0)
+          {
+            board[1][1] = 2;
+            vez = 1;
+            digitalWrite(LEDlist[1][1], HIGH);
+          } 
+        if (board[1][0]==0&&vez == 0)
+          {
+            board[1][0] = 2;
+            vez = 1;
+            digitalWrite(LEDlist[1][0], HIGH);
+          } 
+        if (board[0][1]==0&&vez == 0)
+          {
+            board[0][1] = 2;
+            vez = 1;
+            digitalWrite(LEDlist[0][1], HIGH);
+          } 
+        if (board[1][2]==0&&vez == 0)
+          {
+            board[1][2] = 2;
+            vez = 1;
+            digitalWrite(LEDlist[1][2], HIGH);
+          } 
+        if (board[2][1]==0&&vez == 0)
+          {
+            board[2][1] = 2;
+            vez = 1;
+            digitalWrite(LEDlist[2][1], HIGH);
+          } 
+
+        if (board[0][0]==0&&vez == 0)
+          {
+            board[0][0] = 2;
+            vez = 1;
+            digitalWrite(LEDlist[0][0], HIGH);
+          } 
+        if (board[2][2]==0&&vez == 0)
+          {
+            board[2][2] = 2;
+            vez = 1;
+            digitalWrite(LEDlist[2][2], HIGH);
+          } 
+        if (board[0][2]==0&&vez == 0)
+          {
+            board[0][2] = 2;
+            vez = 1;
+            digitalWrite(LEDlist[0][2], HIGH);
+          } 
+        }
+
+        Serial.print("turno: ");
+        Serial.println(turno);
+        String str;
+
+        Serial.println(str+board[2][2]+" "+board[2][1]+" "+board[2][0]);
+        Serial.println(str+board[1][2]+" "+board[1][1]+" "+board[1][0]);
+        Serial.println(str+board[0][2]+" "+board[0][1]+" "+board[0][0]);
+        turno ++;
+
+        if(gameOver(board)){ //all lights
+          gameon = 0;
+          o_win();
+          break;      
+        }
     }
 
-    if(gameOver(board)){ //all lights
-      gameon = 0;
-      o_win();
-      break;      
-    }
 
-    Serial.print("turno: ");
-    Serial.println(turno);
-    String str;
-
-    Serial.println(str+board[0][0]+" "+board[0][1]+" "+board[0][2]);
-    Serial.println(str+board[1][0]+" "+board[1][1]+" "+board[1][2]);
-    Serial.println(str+board[2][0]+" "+board[2][1]+" "+board[0][2]);
-    turno ++;
     
 }
-}
-
