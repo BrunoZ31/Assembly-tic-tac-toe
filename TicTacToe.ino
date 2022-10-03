@@ -17,10 +17,9 @@
   const int butlist[3][3] = {{2,3,4},{5,6,7},{8,9,10}};
   
   int board[3][3];
+  int piscando[5] = {0};
   
-  unsigned long previousMillis = millis();        // will store last time LED was updated
-  unsigned long currentMillis = millis();
-  int ledState = LOW;
+  bool ledState = false;
 
 void x_win(){
   for(int i=0;i <= 7; i+=2){
@@ -64,15 +63,14 @@ void padrao(){
   
 }
 
-int ledblink(int ledPin){
-  const int interval = 1000;           // interval at which to blink (milliseconds)
-  
-  if (currentMillis - previousMillis >= interval) {
-    // save the last time you blinked the LED
-    previousMillis = currentMillis;
-    // set the LED with the ledState of the variable:
-    digitalWrite(ledPin, ledState);
-}
+ISR(TIMER1_COMPA_vect)
+{
+  ledState =!ledState;
+  for(int n=0; n<5; n++){
+    if(piscando[n] != 0){
+    digitalWrite(piscando[n], ledState);
+    }
+  }
 }
 
 bool rowCrossed(int board[3][3])
@@ -139,6 +137,28 @@ void setup() {
     pinMode(LEDlist[i][j], OUTPUT);
     }
   }
+
+  TCCR1A = 0;                      //Reset Timer1 control Registor A
+
+  bitClear(TCCR1B, WGM13);         //Set CTC mode
+  bitSet(TCCR1B, WGM12);
+
+
+  bitSet(TCCR1B, CS12);            //Set prescaler to 1024
+  bitClear(TCCR1B, CS11);
+  bitSet(TCCR1B, CS10);
+
+  //Reset Timer1
+  TCNT1 = 0;
+
+  //set compare value
+  //OCR1A = 3906;     //for 0.25sec
+  OCR1A = 7812;    //for 0.5sec
+  //OCR1A = 15625;   //for 1sec
+  //OCR1A = 31250;   //for 2sec
+
+  bitSet(TIMSK1, OCIE1A); // Enable Timer1 compare interrupt
+  sei();                  // Enable global interrupts
 }
 void loop() {
   // read the input pin:
@@ -147,7 +167,8 @@ void loop() {
   bool vez = 1;
   int counter = 0;
   int turno = 0;
-
+  
+  
   for(int i=0;i < 3; i++){
     for (int j = 0; j < 3; j++)
     {
@@ -216,7 +237,7 @@ void loop() {
             {
               board[i][j] = 2;
               vez = 1;
-              digitalWrite(LEDlist[i][j], HIGH);
+              piscando[turno] = LEDlist[i][j];
             }
           i++;
         }
@@ -239,9 +260,9 @@ void loop() {
             {
               board[j][i] = 2;
               vez = 1;
-              digitalWrite(LEDlist[j][i], HIGH);
+              piscando[turno] = LEDlist[j][i];
             }
-          i = i + 1;
+          i++;
         }
       
       //Check diagonals
@@ -260,7 +281,7 @@ void loop() {
             {
               board[i][i] = 2;
               vez = 1;
-              digitalWrite(LEDlist[i][i], HIGH);
+              piscando[turno] = LEDlist[i][i];
             }  
         }   
 
@@ -280,7 +301,7 @@ void loop() {
             {
               board[i][2-i] = 2;
               vez = 1;
-              digitalWrite(LEDlist[i][2-i], HIGH);
+              piscando[turno] = LEDlist[i][2-i];
             }  
         }   
         
@@ -306,9 +327,9 @@ void loop() {
             {
               board[i][j] = 2;
               vez = 1;
-              digitalWrite(LEDlist[i][j], HIGH);
+              piscando[turno] = LEDlist[i][j];
             }
-          i = i + 1;
+          i++;
         }
       
     //Check columns
@@ -329,7 +350,7 @@ void loop() {
             {
               board[j][i] = 2;
               vez = 1;
-              digitalWrite(LEDlist[j][i], HIGH);
+              piscando[turno] = LEDlist[j][i];
             }
           i++;
         }
@@ -353,7 +374,7 @@ void loop() {
               {
                 board[i][i] = 2;
                 vez = 1;
-                digitalWrite(LEDlist[i][i], HIGH);
+                piscando[turno] = LEDlist[i][i];
               }  
           }
         }   
@@ -374,7 +395,7 @@ void loop() {
               {
                 board[i][2-i] = 2;
                 vez = 1;
-                digitalWrite(LEDlist[i][2-1], HIGH);
+                piscando[turno] = LEDlist[i][2-i];
               }  
           }   
           }
@@ -384,50 +405,50 @@ void loop() {
           {
             board[1][1] = 2;
             vez = 1;
-            digitalWrite(LEDlist[1][1], HIGH);
+            piscando[turno] = LEDlist[1][1];
           } 
         if (board[1][0]==0&&vez == 0)
           {
             board[1][0] = 2;
             vez = 1;
-            digitalWrite(LEDlist[1][0], HIGH);
+            piscando[turno] = LEDlist[1][0];
           } 
         if (board[0][1]==0&&vez == 0)
           {
             board[0][1] = 2;
             vez = 1;
-            digitalWrite(LEDlist[0][1], HIGH);
+            piscando[turno] = LEDlist[0][1];
           } 
         if (board[1][2]==0&&vez == 0)
           {
             board[1][2] = 2;
             vez = 1;
-            digitalWrite(LEDlist[1][2], HIGH);
+            piscando[turno] = LEDlist[1][2];
           } 
         if (board[2][1]==0&&vez == 0)
           {
             board[2][1] = 2;
             vez = 1;
-            digitalWrite(LEDlist[2][1], HIGH);
+            piscando[turno] = LEDlist[2][1];
           } 
 
         if (board[0][0]==0&&vez == 0)
           {
             board[0][0] = 2;
             vez = 1;
-            digitalWrite(LEDlist[0][0], HIGH);
+            piscando[turno] = LEDlist[0][0];
           } 
         if (board[2][2]==0&&vez == 0)
           {
             board[2][2] = 2;
             vez = 1;
-            digitalWrite(LEDlist[2][2], HIGH);
+            piscando[turno] = LEDlist[2][2];
           } 
         if (board[0][2]==0&&vez == 0)
           {
             board[0][2] = 2;
             vez = 1;
-            digitalWrite(LEDlist[0][2], HIGH);
+            piscando[turno] = LEDlist[0][2];
           } 
         }
 
@@ -446,6 +467,10 @@ void loop() {
           break;      
         }
     }
+    for(int n=0; n<5; n++){
+      piscando[n]=0;
+    }
+    delay(1000);
 
 
     
