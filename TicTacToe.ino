@@ -160,6 +160,19 @@ void setup() {
   bitSet(TIMSK1, OCIE1A); // Enable Timer1 compare interrupt
   sei();                  // Enable global interrupts
 }
+
+void clearBoard(int board[3][3]){
+  for(int i=0;i < 3; i++){
+    for (int j = 0; j < 3; j++)
+    {
+      board[i][j] = 0;
+    }
+  }
+  for(int n=0; n<5; n++){
+      piscando[n]=0;
+    }
+}
+
 void loop() {
   // read the input pin:
   bool buttonState;
@@ -169,12 +182,7 @@ void loop() {
   int turno = 0;
   
   
-  for(int i=0;i < 3; i++){
-    for (int j = 0; j < 3; j++)
-    {
-      board[i][j] = 0;
-    }
-  }
+  clearBoard(board);
   // JOGO COMEÇOU
     // padrao de inicio
     padrao();
@@ -198,18 +206,20 @@ void loop() {
           }
         }
       }
-      //blink
-    
         
     // END GAME CHECK
     if(gameOver(board)){ //pattern x
       gameon = 0;
+      delay(1500);
+      clearBoard(board);
       x_win();
       break;      
     }
 
     if(turno == 4){ //all lights
       gameon = 0;
+      delay(1500);
+      clearBoard(board);
       padrao();
       break;      
     }
@@ -463,15 +473,11 @@ void loop() {
 
         if(gameOver(board)){ //all lights
           gameon = 0;
+          delay(1500);
+          clearBoard(board);
           o_win();
           break;      
         }
     }
-    for(int n=0; n<5; n++){
-      piscando[n]=0;
-    }
-    delay(1000);
-
-
-    
+    clearBoard(board);
 }
